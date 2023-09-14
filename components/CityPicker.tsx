@@ -4,6 +4,7 @@ import { Country, City } from "country-state-city";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Select from "react-select";
+import { GlobeEuropeAfricaIcon } from "@heroicons/react/24/solid";
 
 type option = {
   value: {
@@ -44,19 +45,57 @@ function CityPicker() {
     setSelectedCity(null);
   };
 
+  const handleSelectedCity = (option: cityOption) => {
+    setSelectedCity(option);
+    router.push(
+      `/location/${option?.value.name}/${option?.value.latitude}/${option?.value.longitude}`
+    );
+  };
+
   return (
-    <div>
-      <div>
-        <label htmlFor="country" className="text-white">
-          Country
-        </label>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2 text-white/80">
+          <GlobeEuropeAfricaIcon className="h-5 w-5 text-white" />
+          <label htmlFor="country" className="text-white">
+            Country
+          </label>
+        </div>
+        <Select
+          className="text-black"
+          value={selectedCountry}
+          onChange={handleSelectedCountry}
+          options={options}
+        />
       </div>
-      <Select
-        className="text-black"
-        value={selectedCountry}
-        onChange={handleSelectedCountry}
-        options={options}
-      />
+
+      {selectedCountry && (
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2 text-white/80">
+            <GlobeEuropeAfricaIcon className="h-5 w-5 text-white" />
+            <label htmlFor="country" className="text-white">
+              City
+            </label>
+          </div>
+          <Select
+            className="text-black"
+            value={selectedCity}
+            onChange={handleSelectedCity}
+            options={City.getCitiesOfCountry(
+              selectedCountry.value.isoCode
+            )?.map((city) => ({
+              value: {
+                latitude: city.latitude!,
+                longitude: city.longitude!,
+                countryCode: city.countryCode,
+                name: city.name,
+                stateCode: city.stateCode,
+              },
+              label: city.name,
+            }))}
+          />
+        </div>
+      )}
     </div>
   );
 }
